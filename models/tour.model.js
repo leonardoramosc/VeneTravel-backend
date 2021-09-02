@@ -8,6 +8,8 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A tour must have a name.'],
       unique: true,
+      minlength: [8, 'A tour name must have at least 8 characters'],
+      maxlength: [40, 'A tour name must have less than 41 characters'],
     },
     slug: String,
     duration: {
@@ -21,10 +23,16 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message: 'Difficulty must be either: easy, medium or difficult',
+      },
     },
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'Rating must be at least 1.0'],
+      max: [5, 'Rating cannot be greater than 5.0'],
     },
     ratingQuantity: {
       type: Number,
