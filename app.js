@@ -1,6 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 
+const AppError = require('./utils/appError');
+
 const tourRouter = require('./routes/tour.routes');
 
 const app = express();
@@ -16,17 +18,15 @@ app.use(express.json());
 app.use('/api/v1/tours', tourRouter);
 
 app.all('*', (req, res, next) => {
-  const err = new Error(`Can't find ${req.originalUrl} on this server!`);
-  err.status = 'fail';
-  err.statusCode = 404;
-
   // If next receives an argument, express will interpret it as
   // an error.
-  next(err);
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
 // Error handler middleware: express only call this when an error is detected.
 app.use((err, req, res, next) => {
+  console.log(err.stack);
+
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
