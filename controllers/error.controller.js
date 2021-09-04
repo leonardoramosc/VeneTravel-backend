@@ -21,6 +21,11 @@ const handleDuplicateFieldsErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+const handleValidationErrorDB = (err) => {
+  const { message } = err;
+  return new AppError(message, 400);
+};
+
 const sendErrorProd = (err, res) => {
   if (err.isOperational) {
     res.status(err.statusCode).json({
@@ -47,6 +52,7 @@ module.exports = (err, req, res, next) => {
 
     if (err.name === 'CastError') error = handleCastErrorDB(error);
     if (err.code === 11000) error = handleDuplicateFieldsErrorDB(err);
+    if (err.name === 'ValidationError') error = handleValidationErrorDB(err);
 
     sendErrorProd(error, res);
   }
