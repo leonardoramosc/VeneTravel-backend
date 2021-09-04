@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon server.js",
     "start:prod": "NODE_ENV=production node server.js",
-    "debug": "ndb server.js"
+    "debug": "ndb server.js",
+    "debug:prod": "NODE_ENV=production ndb server.js"
   },
   "author": "Leonardo Ramos",
   "license": "ISC",
