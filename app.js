@@ -5,6 +5,7 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/error.controller');
 
 const tourRouter = require('./routes/tour.routes');
+const userRouter = require('./routes/user.routes');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
 app.all('*', (req, res, next) => {
   // If next receives an argument, express will interpret it as
