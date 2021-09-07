@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 // name, email, photo, password, passwordConfirm.
 const userSchema = new mongoose.Schema({
@@ -25,6 +26,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'A user must have a password.'],
     minlength: [8, 'Password must have at least 8 characters'],
     maxlength: [16, 'Password must have less than 17 characters'],
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -38,18 +40,22 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre(/^find/, function (next) {
-  this.find().select('-password -passwordConfirm');
-  next();
-});
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
-userSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({
-    $project: { password: 0, passwordConfirm: 0 },
-  });
+  this.password = await bcrypt.hash(this.password, 12);
+
+  this.passwordConfirm = undefined;
 
   next();
 });
+
+userSchema.methods.correctPassword = async function (
+  incomingPassword,
+  userPassword
+) {
+  return await bcrypt.compare(incomingPassword, userPassword);
+};
 
 // eslint-disable-next-line new-cap
 const User = new mongoose.model('User', userSchema);
