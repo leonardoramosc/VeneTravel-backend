@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const catchAsync = require('../utils/catchAsync');
@@ -7,6 +8,9 @@ const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+
+const decodeToken = (token) =>
+  promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
 exports.signup = catchAsync(async (req, res, next) => {
   const { body } = req;
@@ -55,4 +59,37 @@ exports.login = catchAsync(async (req, res, next) => {
     status: 'success',
     token,
   });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  const { authorization } = req.headers;
+  let token;
+  // Check if token exists
+  if (authorization && authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  if (!token) {
+    return next(
+      new AppError('You are not logged in, please log in to get access', 401)
+    );
+  }
+
+  // Check if token is valid
+  const decoded = await decodeToken(token);
+
+  // Check if user exists
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    return next(
+      new AppError('The user belonging to this token does no longer exist', 401)
+    );
+  }
+
+  // Check if user changed password after the token was issued. jwt iat means "issued at"
+  if (user.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError('User recently changed the password', 401));
+  }
+
+  req.user = user;
+  next();
 });

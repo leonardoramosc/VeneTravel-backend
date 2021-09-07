@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema({
       message: 'Confirmation password does not match with password',
     },
   },
+  passwordChangedAt: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -55,6 +56,20 @@ userSchema.methods.correctPassword = async function (
   userPassword
 ) {
   return await bcrypt.compare(incomingPassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (timestampJWT) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    return changedTimestamp > timestampJWT;
+  }
+
+  // False means password has not been changed
+  return false;
 };
 
 // eslint-disable-next-line new-cap
