@@ -104,3 +104,26 @@ exports.restrictTo = function (...roles) {
     next();
   };
 };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // get user based on posted email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new AppError(`Invalid email.`, 404));
+  }
+
+  // generate the random reset token
+  const resetToken = user.createPasswordResetToken();
+  // Since createPasswordResetToken() add the properties <passwordResetToken> and <passwordResetExpires>
+  // we need to save this change in the database, but also we need to disable the validators in order
+  // to avoid errors for example with required fields.
+  await user.save({ validateBeforeSave: false });
+  // send it to user's email
+
+  res.status(200).json({
+    status: 'success',
+    resetToken,
+  });
+});
+
+exports.resetPassword = (req, res, next) => {};
