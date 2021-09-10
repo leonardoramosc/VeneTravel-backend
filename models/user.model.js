@@ -59,6 +59,15 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// Ejecutar este middleware solo en caso de actualizacion de contraseña.
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   incomingPassword,
   userPassword
