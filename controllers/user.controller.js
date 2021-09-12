@@ -83,12 +83,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndRemove(req.params.id);
-
-  if (!user) {
-    return next(new AppError('No user found', 404));
-  }
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
 
   res.status(204).json({
     status: 'success',
