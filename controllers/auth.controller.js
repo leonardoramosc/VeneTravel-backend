@@ -14,6 +14,30 @@ const signToken = (id) =>
 const decodeToken = (token) =>
   promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
+function createSendToken(user, statusCode, res) {
+  const token = signToken(user._id);
+
+  const cookieOpts = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    secure: process.env.NODE_ENV === 'production', // Just send in https if production
+    httpOnly: true, // Cannot be accesed or modified in any way by browser (prevent CSS attack)
+  };
+
+  res.cookie('jwt', token, cookieOpts);
+
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+}
+
 exports.signup = catchAsync(async (req, res, next) => {
   const { body } = req;
 
@@ -25,15 +49,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: body.passwordConfirm,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -55,13 +71,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Invalid email or password', 400));
   }
 
-  const token = signToken(user._id);
-
-  // send jwt
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -176,12 +186,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Log the user in, sent jwt
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -209,11 +214,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log user in, send JWT.
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    message: 'Password updated successfully',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
