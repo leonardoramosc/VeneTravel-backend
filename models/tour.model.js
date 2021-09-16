@@ -135,6 +135,15 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+
+  next();
+});
+
 // QUERY MIDDLEWARE: despues de haber terminado la query, obtener el tiempo que tomo hacerla.
 // tourSchema.post(/^find/, function (docs, next) {
 //   const time = Date.now() - this.start;
