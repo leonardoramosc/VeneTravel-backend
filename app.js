@@ -46,7 +46,7 @@ app.use(xss());
 
 // Prevent parameter pollution (remove duplicate queryparams)
 // with the whitelist option we can specify a list of parameters that
-// are allowed to be repeated. 
+// are allowed to be repeated.
 app.use(
   hpp({
     whitelist: [
