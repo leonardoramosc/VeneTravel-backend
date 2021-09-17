@@ -65,7 +65,7 @@ exports.updateReview = catchAsync(async (req, res, next) => {
   }
 
   // if the logged in user did not write the review, send error.
-  if (review.user.toString() !== req.user._id.toString()) {
+  if (review.user._id.toString() !== req.user._id.toString()) {
     return next(new AppError('You are not allowed to modify this review', 401));
   }
 
