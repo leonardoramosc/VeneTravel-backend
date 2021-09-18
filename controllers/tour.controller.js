@@ -29,7 +29,7 @@ exports.aliasTopTours = (req, res, next) => {
 
 exports.getOneTour = catchAsync(async (req, res, next) => {
   const tourID = req.params.id;
-  const tour = await Tour.findById(tourID);
+  const tour = await Tour.findById(tourID).populate('reviews');
 
   if (!tour) {
     return next(new AppError('No tour found', 404));
