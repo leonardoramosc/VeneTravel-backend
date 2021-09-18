@@ -4,10 +4,10 @@ const AppError = require('../utils/appError');
 
 exports.createReview = catchAsync(async (req, res, next) => {
   // the user ID for the review must be the ID of the logged user.
-  const { user: _user, ...reviewParams } = req.body;
-  reviewParams.user = req.user._id;
+  req.body.user = req.user._id;
+  req.body.tour = req.params.tourId;
 
-  const review = await Review.create(reviewParams);
+  const review = await Review.create(req.body);
 
   res.status(201).json({
     status: 'success',
@@ -33,7 +33,7 @@ exports.getOneReview = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  const reviews = await Review.find({ tour: req.params.tourId });
 
   res.status(200).json({
     status: 'success',
