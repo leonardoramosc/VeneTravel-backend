@@ -2,7 +2,7 @@ const { Router } = require('express');
 const reviewController = require('../controllers/review.controller');
 const authController = require('../controllers/auth.controller');
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 router
   .route('/')
