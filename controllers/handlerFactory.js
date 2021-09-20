@@ -1,5 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.createOne = function (Model) {
   return catchAsync(async (req, res, next) => {
@@ -34,6 +35,25 @@ exports.getOne = function (Model, populateOpts) {
       status: 'success',
       data: {
         [modelName]: doc,
+      },
+    });
+  });
+};
+
+exports.getAll = function (Model) {
+  const modelName = `${Model.modelName.toLowerCase()}s`;
+
+  return catchAsync(async (req, res, next) => {
+    // req.filter it can be added in a middleware for a specific router
+    const filter = req.filter || {};
+    const features = new APIFeatures(Model.find(filter), req.query);
+    const docs = await features.filter().sort().fields().runQuery();
+
+    res.status(200).json({
+      status: 'success',
+      results: docs.length,
+      data: {
+        [modelName]: docs,
       },
     });
   });
