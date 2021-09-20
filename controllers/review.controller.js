@@ -3,20 +3,23 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
-exports.createReview = catchAsync(async (req, res, next) => {
+exports.createReview = factory.createOne(Review);
+exports.deleteReview = factory.deleteOne(Review);
+exports.updateReview = factory.updateOne(Review);
+
+/**
+ * Modify the body of the request to assign the following properties:
+ * user: the logged user
+ * tour: the tour id of specified in the query param
+ * In this way, the user have to specify in the body only the review field.
+ */
+exports.setBodyOnCreate = (req, res, next) => {
   // the user ID for the review must be the ID of the logged user.
   req.body.user = req.user._id;
   req.body.tour = req.params.tourId;
 
-  const review = await Review.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      review,
-    },
-  });
-});
+  next();
+};
 
 exports.getOneReview = catchAsync(async (req, res, next) => {
   const review = await Review.findById(req.params.id);
@@ -44,9 +47,6 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
     },
   });
 });
-
-exports.deleteReview = factory.deleteOne(Review);
-exports.updateReview = factory.updateOne(Review);
 
 exports.validateOnUpdate = async (req, res, next) => {
   try {
