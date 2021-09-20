@@ -46,35 +46,27 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteReview = factory.deleteOne(Review);
+exports.updateReview = factory.updateOne(Review);
 
-exports.updateReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
+exports.validateOnUpdate = async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.id);
 
-  if (!review) {
-    return next(new AppError('No review was found', 400));
-  }
-
-  // if the logged in user did not write the review, send error.
-  if (review.user._id.toString() !== req.user._id.toString()) {
-    return next(new AppError('You are not allowed to modify this review', 401));
-  }
-
-  const { user: _user, ...reviewParams } = req.body;
-  reviewParams.user = req.user._id;
-
-  const updatedReview = await Review.findByIdAndUpdate(
-    req.params.id,
-    reviewParams,
-    {
-      new: true,
-      runValidators: true,
+    if (!review) {
+      return next(new AppError('No review was found', 400));
     }
-  );
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      review: updatedReview,
-    },
-  });
-});
+    // if the logged in user did not write the review, send error.
+    if (review.user._id.toString() !== req.user._id.toString()) {
+      return next(
+        new AppError('You are not allowed to modify this review', 401)
+      );
+    }
+
+    req.body.user = req.user._id;
+
+    next();
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};

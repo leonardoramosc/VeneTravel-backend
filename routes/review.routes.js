@@ -19,6 +19,7 @@ router
   .patch(
     authController.protect,
     authController.restrictTo('user'),
+    reviewController.validateOnUpdate,
     reviewController.updateReview
   )
   .delete(authController.protect, reviewController.deleteReview);
