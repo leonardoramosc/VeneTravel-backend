@@ -4,6 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
+exports.createTour = factory.createOne(Tour);
 exports.updateOneTour = factory.updateOne(Tour);
 exports.deleteTour = factory.deleteOne(Tour);
 
@@ -43,17 +44,6 @@ exports.getOneTour = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       tour,
-    },
-  });
-});
-
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour,
     },
   });
 });
