@@ -20,6 +20,11 @@ function filterObj(obj, ...fields) {
   return newObj;
 }
 
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+};
+
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Error if users Posts password
   if (req.body.password || req.body.passwordConfirm) {
