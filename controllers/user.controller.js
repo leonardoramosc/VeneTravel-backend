@@ -1,10 +1,10 @@
 const User = require('../models/user.model');
-const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 exports.getOneUser = factory.getOne(User);
+exports.getAllUsers = factory.getAll(User);
 exports.updateOneUser = factory.updateOne(User);
 exports.delete = factory.deleteOne(User);
 
@@ -19,19 +19,6 @@ function filterObj(obj, ...fields) {
 
   return newObj;
 }
-
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(User.find(), req.query);
-  const users = await features.filter().sort().fields().runQuery();
-
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-});
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Error if users Posts password
