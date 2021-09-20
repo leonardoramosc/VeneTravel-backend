@@ -1,12 +1,12 @@
 const Review = require('../models/review.model');
-const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 exports.createReview = factory.createOne(Review);
 exports.getOneReview = factory.getOne(Review);
-exports.deleteReview = factory.deleteOne(Review);
+exports.getAllReviews = factory.getAll(Review);
 exports.updateReview = factory.updateOne(Review);
+exports.deleteReview = factory.deleteOne(Review);
 
 /**
  * Modify the body of the request to assign the following properties:
@@ -21,18 +21,6 @@ exports.setBodyOnCreate = (req, res, next) => {
 
   next();
 };
-
-exports.getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find({ tour: req.params.tourId });
-
-  res.status(200).json({
-    status: 'success',
-    results: reviews.length,
-    data: {
-      reviews,
-    },
-  });
-});
 
 exports.validateOnUpdate = async (req, res, next) => {
   try {

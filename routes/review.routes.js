@@ -4,11 +4,21 @@ const authController = require('../controllers/auth.controller');
 
 const router = Router({ mergeParams: true });
 
+router.use('/', authController.protect);
+
+router.use('/', (req, res, next) => {
+  if (req.params.tourId) {
+    // This filter will be used by the handlerFactory get all method
+    req.filter = { tour: req.params.tourId };
+  }
+
+  next();
+});
+
 router
   .route('/')
-  .get(authController.protect, reviewController.getAllReviews)
+  .get(reviewController.getAllReviews)
   .post(
-    authController.protect,
     authController.restrictTo('user'),
     reviewController.setBodyOnCreate,
     reviewController.createReview
@@ -16,13 +26,12 @@ router
 
 router
   .route('/:id')
-  .get(authController.protect, reviewController.getOneReview)
+  .get(reviewController.getOneReview)
   .patch(
-    authController.protect,
     authController.restrictTo('user'),
     reviewController.validateOnUpdate,
     reviewController.updateReview
   )
-  .delete(authController.protect, reviewController.deleteReview);
+  .delete(reviewController.deleteReview);
 
 module.exports = router;
