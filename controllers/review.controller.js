@@ -4,6 +4,7 @@ const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 exports.createReview = factory.createOne(Review);
+exports.getOneReview = factory.getOne(Review);
 exports.deleteReview = factory.deleteOne(Review);
 exports.updateReview = factory.updateOne(Review);
 
@@ -20,21 +21,6 @@ exports.setBodyOnCreate = (req, res, next) => {
 
   next();
 };
-
-exports.getOneReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
-
-  if (!review) {
-    return next(new AppError('No review found', 400));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      review,
-    },
-  });
-});
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
   const reviews = await Review.find({ tour: req.params.tourId });

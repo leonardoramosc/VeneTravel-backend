@@ -4,6 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
+exports.getOneUser = factory.getOne(User);
 exports.updateOneUser = factory.updateOne(User);
 exports.delete = factory.deleteOne(User);
 
@@ -28,22 +29,6 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     results: users.length,
     data: {
       users,
-    },
-  });
-});
-
-exports.getOneUser = catchAsync(async (req, res, next) => {
-  const userID = req.params.id;
-  const user = await User.findById(userID);
-
-  if (!user) {
-    return next(new AppError('No user found', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      user,
     },
   });
 });
