@@ -46,8 +46,15 @@ exports.getAll = function (Model) {
   return catchAsync(async (req, res, next) => {
     // req.filter it can be added in a middleware for a specific router
     const filter = req.filter || {};
-    const features = new APIFeatures(Model.find(filter), req.query);
-    const docs = await features.filter().sort().fields().runQuery();
+    const features = new APIFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .fields()
+      ._paginate();
+
+    // const docs = await features.mongoQuery.explain(); get stats about the query.
+
+    const docs = await features.mongoQuery;
 
     res.status(200).json({
       status: 'success',
