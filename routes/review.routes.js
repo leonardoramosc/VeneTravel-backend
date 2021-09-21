@@ -28,10 +28,13 @@ router
   .route('/:id')
   .get(reviewController.getOneReview)
   .patch(
-    authController.restrictTo('user'),
+    authController.restrictTo('user', 'admin'),
     reviewController.validateOnUpdate,
     reviewController.updateReview
   )
-  .delete(reviewController.deleteReview);
+  .delete(
+    authController.restrictTo('user', 'admin'),
+    reviewController.deleteReview
+  );
 
 module.exports = router;
