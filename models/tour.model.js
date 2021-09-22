@@ -8,8 +8,8 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A tour must have a name.'],
       unique: true,
-      minlength: [8, 'A tour name must have at least 8 characters'],
-      maxlength: [40, 'A tour name must have less than 41 characters'],
+      minlength: [3, 'A tour name must have at least 8 characters'],
+      maxlength: [255, 'A tour name must have less than 256 characters'],
     },
     slug: String,
     duration: {
@@ -33,6 +33,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       min: [1, 'Rating must be at least 1.0'],
       max: [5, 'Rating cannot be greater than 5.0'],
+      set: (val) => Math.round(val * 10) / 10,
     },
     ratingQuantity: {
       type: Number,
