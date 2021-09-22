@@ -1,5 +1,6 @@
 /* eslint-disable new-cap */
 const mongoose = require('mongoose');
+const Tour = require('./tour.model');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -51,6 +52,36 @@ reviewSchema.pre(/^find/, function (next) {
   });
 
   next();
+});
+
+// Add a method to the Model to calc AverareRatings and persist it in the tour.
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  // 'This' keyword points to the Model (not the document)
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingQuantity: stats[0].nRating,
+    ratingsAverage: stats[0].avgRating,
+  });
+};
+
+// After save a review, update the ratingsAverage of the tour.
+// post middlewares doesn't receive 'next' callback.
+reviewSchema.post('save', function () {
+  // 'this' keyword is the current document, we use constructor becase calcAverareRatings was declared in the model.
+  // the model is the constructor of the document.
+  this.constructor.calcAverageRatings(this.tour);
 });
 
 const Review = new mongoose.model('Review', reviewSchema);
