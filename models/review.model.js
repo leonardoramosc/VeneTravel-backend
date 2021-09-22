@@ -70,9 +70,14 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
     },
   ]);
 
+  // if the stats array is empty that means that the tour doesn't have any review
+  // so that means tthat ratingsQuantity must be 0 and avgRating must be set to the default 4.5
+  const nRating = stats[0] ? stats[0].nRating : 0;
+  const avgRating = stats[0] ? stats[0].avgRating : 4.5;
+
   await Tour.findByIdAndUpdate(tourId, {
-    ratingQuantity: stats[0].nRating,
-    ratingsAverage: stats[0].avgRating,
+    ratingQuantity: nRating,
+    ratingsAverage: avgRating,
   });
 };
 
@@ -82,6 +87,21 @@ reviewSchema.post('save', function () {
   // 'this' keyword is the current document, we use constructor becase calcAverareRatings was declared in the model.
   // the model is the constructor of the document.
   this.constructor.calcAverageRatings(this.tour);
+});
+
+// Assign the review document that is beign updated or deleted to the query object so we
+// can then make use of the calcAverageRatings method of the Review model to update the
+// ratingsAverage and ratingQuantity of the tour.
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  // 'this' keyword points to the query, so assign to the query the 'targetReview' property which is the review document
+  this.targetReview = await this.findOne();
+  next();
+});
+
+// After updating or deleting the review, make use of the targetReview document that we define previously
+// to update the ratings of the tour
+reviewSchema.post(/^findOneAnd/, async function () {
+  await this.targetReview.constructor.calcAverageRatings(this.r.tour);
 });
 
 const Review = new mongoose.model('Review', reviewSchema);
