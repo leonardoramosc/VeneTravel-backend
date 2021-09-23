@@ -118,6 +118,7 @@ const tourSchema = new mongoose.Schema(
 // Agregar index en price en orden ascendente (-1 siquieremos que sea descendente)
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' }); // for geoespacial data.
 
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
