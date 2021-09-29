@@ -80,7 +80,10 @@ exports.protect = catchAsync(async (req, res, next) => {
   // Check if token exists
   if (authorization && authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
+
   if (!token) {
     return next(
       new AppError('You are not logged in, please log in to get access', 401)
@@ -104,6 +107,29 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   req.user = user;
+  next();
+});
+
+// Only for rendered pages, no errors
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    // verify token
+    const decoded = await decodeToken(req.cookies.jwt);
+    // Check if user exists
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return next();
+    }
+
+    // Check if user changed password after the token was issued. jwt iat means "issued at"
+    if (user.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    // There is a logged in user
+    res.locals.user = user;
+  }
+
   next();
 });
 
