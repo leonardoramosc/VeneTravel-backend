@@ -27,6 +27,5 @@ if (loginForm) {
 }
 
 if (logOutBtn) {
-  console.log('LOGOUT EXIST')
   logOutBtn.addEventListener('click', logout);
 }
