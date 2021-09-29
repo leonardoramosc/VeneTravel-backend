@@ -17,7 +17,10 @@ locations.forEach((loc) => {
   const markerEl = document.createElement('div');
   markerEl.className = 'marker';
 
-  new mapboxgl.Marker(markerEl).setLngLat(loc.coordinates).addTo(map);
+  new mapboxgl.Marker({
+    element: markerEl,
+    anchor: 'bottom',
+  }).setLngLat(loc.coordinates).addTo(map);
 
   new mapboxgl.Popup({
     offset: 30
