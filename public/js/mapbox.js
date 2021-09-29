@@ -1,7 +1,6 @@
 /* eslint-disable */
-const locations = JSON.parse(document.getElementById('map').dataset.locations);
-
-mapboxgl.accessToken =
+export const displayMap = (locations) => {
+  mapboxgl.accessToken =
   'pk.eyJ1IjoibGVvcnJjIiwiYSI6ImNrdTJyYW95ajE0OTEydXFyemY5OXlhcnIifQ.LiuRx4U-qGo6QavObqfo1w';
 
 var map = new mapboxgl.Map({
@@ -40,3 +39,6 @@ map.fitBounds(bounds, {
     right: 100
   }
 });
+
+}
+
