@@ -8902,7 +8902,7 @@ var logout = /*#__PURE__*/function () {
             res = _context2.sent;
 
             if (res.data.status === 'success') {
-              window.location.reload();
+              window.location.assign('/');
             }
 
             _context2.next = 10;
@@ -9289,7 +9289,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "46215" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "35375" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
