@@ -1,9 +1,13 @@
+/* eslint-disable */
 import axios from 'axios';
 import { showAlert } from './alerts';
 
 export const updateUserData = async (data, type) => {
   try {
-    const url = type === 'password' ? 'http://localhost:8000/api/v1/users/updatePassword': 'http://localhost:8000/api/v1/users/updateMe';
+    const url =
+      type === 'password'
+        ? 'http://localhost:8000/api/v1/users/updatePassword'
+        : 'http://localhost:8000/api/v1/users/updateMe';
 
     const res = await axios({
       method: 'PATCH',
@@ -18,5 +22,3 @@ export const updateUserData = async (data, type) => {
     showAlert('error', err.response.data.message);
   }
 };
-
-
