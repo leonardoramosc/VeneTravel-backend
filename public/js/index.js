@@ -9,6 +9,7 @@ const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('#login.form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
+const userPassForm = document.querySelector('.form-user-password');
 
 // DELEGATION
 if (mapBox) {
@@ -33,18 +34,31 @@ if (logOutBtn) {
 }
 
 if (userDataForm) {
-  userDataForm.addEventListener('submit', async (e) => {
+  userDataForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
-    const userName = document.getElementById('name');
-    const userEmail = document.getElementById('email');
+    const name = document.getElementById('name').value
+    const email = document.getElementById('email').value
 
-    try {
-      const {name, email} = await updateUserData(userName.value, userEmail.value);
-      userName.value = name;
-      userEmail.value = email;
-    } catch (err) {
-      return err;
-    }
+    updateUserData({name, email}, 'data');
   })
 }
+
+if (userPassForm) {
+  userPassForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    document.querySelector('.btn--save-password').textContent = 'Updating...';
+
+    const currentPassword = document.getElementById('password-current').value;
+    const newPassword = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+
+    await updateUserData({currentPassword, newPassword, passwordConfirm}, 'password');
+
+    document.querySelector('.btn--save-password').textContent = 'Save password';
+    document.getElementById('password-current').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('password-confirm').value = '';
+  });
+};
