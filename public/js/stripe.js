@@ -14,7 +14,6 @@ export const bookTour = async (tourId) => {
     );
 
     // 2) Create checkout form + charge credit card
-    console.log(session.data.session.id);
     await stripe.redirectToCheckout({
       sessionId: session.data.session.id,
     });
