@@ -10,10 +10,10 @@ process.on('uncaughtException', (err) => {
 
 dotenv.config({ path: './config.env' });
 
-const { DB_LOCAL_URI } = process.env;
+const { DB_URI } = process.env;
 
 mongoose
-  .connect(DB_LOCAL_URI, {
+  .connect(DB_URI, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
