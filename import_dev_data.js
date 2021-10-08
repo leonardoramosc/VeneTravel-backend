@@ -7,7 +7,7 @@ const Review = require('./models/review.model');
 
 dotenv.config({ path: './config.env' });
 
-const DB = process.env.DB_LOCAL_URI;
+const DB = process.env.DB_URI;
 
 mongoose
   .connect(DB, {
